@@ -1,40 +1,71 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 
-void main() {
-  runApp(const MyApp());
+import 'package:flutter/material.dart';
+import 'package:workmanager/workmanager.dart';
+
+void main() => runApp(const MyApp());
+
+const simpleTaskKey = "simpleTaskKey";
+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    switch (task) {
+      case simpleTaskKey:
+        debugPrint("$simpleTaskKey was executed. inputData = $inputData");
+        break;
+    }
+
+    return Future.value(true);
+  });
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Background Task',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(),
-    );
-  }
-}
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text("Flutter Background Task"),
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                ElevatedButton(
+                  child: const Text("Start the Flutter background service"),
+                  onPressed: () {
+                    Workmanager().initialize(
+                      callbackDispatcher,
+                      isInDebugMode: true,
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter Background Task'),
-      ),
-      body: const Center(
-        child: Text('Hello World'),
+                /// This task runs once and trigger immediately
+                ElevatedButton(
+                  child: const Text("Register OneOff Task"),
+                  onPressed: () {
+                    Workmanager().registerOneOffTask(
+                      simpleTaskKey,
+                      simpleTaskKey,
+                      inputData: <String, dynamic>{'hello': "bibash"},
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
