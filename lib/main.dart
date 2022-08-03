@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
+import 'dart:developer' as dev;
 
 void main() => runApp(const MyApp());
 
@@ -55,6 +56,7 @@ class _MyAppState extends State<MyApp> {
                 ElevatedButton(
                   child: const Text("Register OneOff Task"),
                   onPressed: () {
+                    dev.debugger();
                     Workmanager().registerOneOffTask(
                       simpleTaskKey,
                       simpleTaskKey,
